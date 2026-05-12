@@ -1,13 +1,16 @@
+import os
 import requests
 import time
 
-# --- CONFIGURACIÓN ---
+# --- CONFIGURACIÓN DESDE SECRETS (Invisibles) ---
 TOKEN = os.environ.get("TELEGRAM_TOKEN")
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
+
 SKIN_NAME = "M4A1-S | Liquidation (Factory New)"
-PRECIO_MAXIMO = 15.75  # <--- Nuevo objetivo
+PRECIO_MAXIMO = 15.75
 
 def consultar():
+    # URL de la M4A1-S Liquidación FN
     url = "https://steamcommunity.com/market/listings/730/M4A1-S%20%7C%20Liquidation%20%28Factory%20New%29/render/?query=&start=0&count=10&currency=1&language=english"
     
     try:
@@ -19,38 +22,33 @@ def consultar():
         res = requests.get(url, headers=headers, timeout=15)
         data = res.json()
 
-        if data.get("total_count", 0) == 0:
-            print(f"[{time.strftime('%H:%M:%S')}] Steam no devolvió datos. (IP en espera)")
+        if not data or data.get("total_count", 0) == 0:
+            print(f"[{time.strftime('%H:%M:%S')}] Steam no devolvió datos.")
             return False
 
-        encontrado = False
         for listing_id in data["listinginfo"]:
             listing = data["listinginfo"][listing_id]
+            # Cálculo de precio con comisión de Steam incluida
             precio = (listing["converted_price"] + listing["converted_fee"]) / 100
             
-            print(f"[{time.strftime('%H:%M:%S')}] Precio actual: ${precio:.2f}")
+            print(f"[{time.strftime('%H:%M:%S')}] Precio actual encontrado: ${precio:.2f}")
 
             if precio < PRECIO_MAXIMO:
                 msg = f"🚨 ¡OFERTA! | Precio: ${precio:.2f} | Link: https://steamcommunity.com/market/listings/730/M4A1-S%20%7C%20Liquidation%20(Factory%20New)"
                 requests.get(f"https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={CHAT_ID}&text={msg}")
-                print(f">>> ALERTA ENVIADA: ${precio:.2f}")
-                encontrado = True
+                print(f">>> ALERTA ENVIADA A TELEGRAM: ${precio:.2f}")
+                return True # Terminamos si encontramos una oferta
         
-        return encontrado
+        return False
                 
     except Exception as e:
         print(f"[{time.strftime('%H:%M:%S')}] Error: {e}")
     return False
 
+# --- EJECUCIÓN ÚNICA ---
 print("==========================================")
-print("       MONITOR DE PRECIOS ACTIVADO")
 print(f" Buscando: {SKIN_NAME} < ${PRECIO_MAXIMO}")
-print("==========================================\n")
+print("==========================================")
 
-# Aviso de reinicio en Telegram
-requests.get(f"https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={CHAT_ID}&text=🚀 Monitor actualizado. Objetivo: ${PRECIO_MAXIMO}")
-
-while True:
-    consultar()
-    print(f"\n[{time.strftime('%H:%M:%S')}] Esperando 10 minutos para el próximo chequeo...")
-    time.sleep(600)
+# Ejecuta la consulta una sola vez (GitHub se encarga de la repetición)
+consultar()
