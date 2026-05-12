@@ -2,8 +2,7 @@ import requests
 import time
 
 # --- CONFIGURACIÓN ---
-TOKEN = "1139831374:AAF-idyHp4e0F3fuba3LrOkpkPC3CuloI-M"
-CHAT_ID = "99216389"
+
 SKIN_NAME = "M4A1-S | Liquidation (Factory New)"
 PRECIO_MAXIMO = 15.75  # <--- Nuevo objetivo
 
