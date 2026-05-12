@@ -7,7 +7,7 @@ TOKEN = os.environ.get("TELEGRAM_TOKEN")
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
 SKIN_NAME = "M4A1-S | Liquidation (Factory New)"
-PRECIO_MAXIMO = 15.75
+PRECIO_MAXIMO = 15.55
 
 def consultar():
     # URL de la M4A1-S Liquidación FN
