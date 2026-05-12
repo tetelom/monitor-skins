@@ -2,7 +2,8 @@ import requests
 import time
 
 # --- CONFIGURACIÓN ---
-
+TOKEN = os.environ.get("TELEGRAM_TOKEN")
+CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 SKIN_NAME = "M4A1-S | Liquidation (Factory New)"
 PRECIO_MAXIMO = 15.75  # <--- Nuevo objetivo
 
